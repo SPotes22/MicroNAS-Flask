@@ -1,0 +1,127 @@
+from flask import Flask, request, redirect, url_for, send_from_directory, render_template_string
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from werkzeug.utils import secure_filename
+from flask_bcrypt import Bcrypt
+import os
+
+app = Flask(__name__)
+app.secret_key = 'secreto-seguro'
+bcrypt = Bcrypt(app)
+login_manager = LoginManager(app)
+
+UPLOAD_FOLDER = './archivos'
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+# USUARIOS DE PRUEBA (puedes cargar desde archivo después)
+usuarios = {
+    'admin': {'password': bcrypt.generate_password_hash('admin123').decode('utf-8'), 'rol': 'administrator'},
+    'cliente': {'password': bcrypt.generate_password_hash('cliente123').decode('utf-8'), 'rol': 'cliente'},
+    'usuario': {'password': bcrypt.generate_password_hash('usuario123').decode('utf-8'), 'rol': 'usuario'},
+}
+
+# MODELO DE USUARIO
+class Usuario(UserMixin):
+    def __init__(self, username):
+        self.id = username
+        self.rol = usuarios[username]['rol']
+
+@login_manager.user_loader
+def load_user(user_id):
+    if user_id in usuarios:
+        return Usuario(user_id)
+    return None
+
+# LOGIN
+@app.route('/', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        user = request.form['usuario']
+        password = request.form['clave']
+        if user in usuarios and bcrypt.check_password_hash(usuarios[user]['password'], password):
+            login_user(Usuario(user))
+            return redirect(url_for('inicio'))
+        return 'Credenciales inválidas'
+    return '''
+    <form method="post">
+        Usuario: <input name="usuario"><br>
+        Contraseña: <input type="password" name="clave"><br>
+        <input type="submit" value="Entrar">
+    </form>
+    '''
+
+# CERRAR SESIÓN
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
+# PÁGINA PRINCIPAL
+@app.route('/inicio')
+@login_required
+def inicio():
+    return render_template_string("""
+    <h2>Bienvenido {{current_user.id}} ({{current_user.rol}})</h2>
+    <ul>
+        <li><a href="/listar">Listar archivos</a></li>
+        {% if current_user.rol != 'usuario' %}
+        <li><a href="/subir">Subir archivo</a></li>
+        {% endif %}
+        {% if current_user.rol == 'administrator' %}
+        <li><a href="/eliminar">Eliminar archivos</a></li>
+        {% endif %}
+        <li><a href="/logout">Cerrar sesión</a></li>
+    </ul>
+    """, current_user=current_user)
+
+# SUBIR ARCHIVOS
+@app.route('/subir', methods=['GET', 'POST'])
+@login_required
+def subir():
+    if current_user.rol == 'usuario':
+        return 'No tienes permiso para subir archivos'
+    if request.method == 'POST':
+        archivo = request.files['archivo']
+        archivo.save(os.path.join(UPLOAD_FOLDER, secure_filename(archivo.filename)))
+        return 'Archivo subido'
+    return '<form method="post" enctype="multipart/form-data">Archivo: <input type="file" name="archivo"><input type="submit"></form>'
+
+# LISTAR ARCHIVOS
+@app.route('/listar')
+@login_required
+def listar():
+    archivos = os.listdir(UPLOAD_FOLDER)
+    enlaces = ''.join(f'<li><a href="/descargar/{f}">{f}</a></li>' for f in archivos)
+    return f'<ul>{enlaces}</ul><a href="/inicio">Volver</a>'
+    
+
+# DESCARGAR ARCHIVO
+@app.route('/descargar/<nombre>')
+@login_required
+def descargar(nombre):
+    return send_from_directory(UPLOAD_FOLDER, nombre)
+
+# ELIMINAR ARCHIVOS (solo admin)
+@app.route('/eliminar', methods=['GET', 'POST'])
+@login_required
+def eliminar():
+    if current_user.rol != 'administrator':
+        return 'No tienes permiso para eliminar archivos'
+    if request.method == 'POST':
+        archivo = request.form['archivo']
+        try:
+            os.remove(os.path.join(UPLOAD_FOLDER, archivo))
+            return f'{archivo} eliminado'
+        except:
+            return 'Error al eliminar'
+    archivos = os.listdir(UPLOAD_FOLDER)
+    opciones = ''.join(f'<option value="{f}">{f}</option>' for f in archivos)
+    return f'''
+    <form method="post">
+        <select name="archivo">{opciones}</select>
+        <input type="submit" value="Eliminar">
+    </form><a href="/inicio">Volver</a>
+    '''
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8000)
