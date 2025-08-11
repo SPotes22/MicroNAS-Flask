@@ -1,3 +1,24 @@
+'''
+microNAS - Servidor de Archivos Básico en Red
+Copyright (C) 2025 Santiago Potes Giraldo
+SPDX-License-Identifier: GPL-3.0-or-later
+
+Este archivo es parte de microNAS.
+
+microNAS is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <https://www.gnu.org/licenses/>.
+'''
+
 from flask import Flask, request, redirect, url_for, send_from_directory, render_template_string
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.utils import secure_filename
