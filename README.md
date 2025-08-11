@@ -9,7 +9,7 @@
 1. **Clona el repositorio o descarga el `.zip`:**
 
 ```bash
-git clone https://github.com/tuusuario/microNAS.git
+git clone https://github.com/SPotes22/Paranoid-Vault.git
 cd microNAS
 ```
 
@@ -47,7 +47,7 @@ pip install -r requirements.txt
 6. **Ejecuta la aplicación:**
 
 ```bash
-python app.py
+python servidor.py
 ```
 
 ---
@@ -60,6 +60,8 @@ python app.py
 | Cliente  | Subir y listar               | `cliente`  | `cliente123` |
 | Usuario  | Solo puede leer archivos     | `usuario`  | `usuario123` |
 
+Las contrasenias recomiendo moverlas a un .env o crear el modulo de usuarios en un archivo aparte de servidor.py para mayor seguridad y modularidad
+ 
 ---
 
 
