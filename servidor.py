@@ -35,7 +35,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # USUARIOS DE PRUEBA (puedes cargar desde archivo después)
 usuarios = {
-    'admin': {'password': bcrypt.generate_password_hash('admin123').decode('utf-8'), 'rol': 'administrator'},
+    'admin': {'password': bcrypt.generate_password_hash('Ng1}vaS{tMPgx8tD').decode('utf-8'), 'rol': 'administrator'},
     'cliente': {'password': bcrypt.generate_password_hash('cliente123').decode('utf-8'), 'rol': 'cliente'},
     'usuario': {'password': bcrypt.generate_password_hash('usuario123').decode('utf-8'), 'rol': 'usuario'},
 }
