@@ -104,6 +104,10 @@ Consulta el archivo [LICENSE](LICENSE) incluido para más detalles.
 
 ---
 
+[![License: GPL v3 or later](https://img.shields.io/badge/License-GPLv3+-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Project Status: Actively Maintained](https://img.shields.io/badge/Status-Activo-success.svg)](#)
+
+---
 ## ✨ Créditos
 
 Desarrollado por Santiago Potes Giraldo.  
