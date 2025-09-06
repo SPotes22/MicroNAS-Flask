@@ -26,7 +26,7 @@ from flask_bcrypt import Bcrypt
 import os
 
 app = Flask(__name__)
-app.secret_key = 'secreto-seguro-123'
+app.secret_key = 'secreto-seguro'
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 
